@@ -150,7 +150,7 @@
 <body>
 
   <header>
-    <h1> COVÉ MENU</h1>
+    <h1>COVÉ MENU</h1>
   </header>
 
   <div class="menu">
@@ -194,14 +194,14 @@
 
     <div class="note-box">
       <label for="note"><strong>Note (optional):</strong></label>
-      <textarea id="note" placeholder="Car number , car color , etc..."></textarea>
+      <textarea id="note" placeholder="Car number, car color, etc..."></textarea>
     </div>
 
     <button class="order-btn" onclick="sendWhatsAppOrder()">Send Order via WhatsApp</button>
 
     <div class="allergens">
       <p><strong>Allergens:</strong></p>
-  <span>Milk</span><span>Eggs</span><span>Gluten</span><span>Soy</span><span>Coffee</span>
+      <span>Milk</span><span>Eggs</span><span>Gluten</span><span>Soy</span><span>Coffee</span>
     </div>
   </div>
 
@@ -224,9 +224,33 @@
       document.getElementById('total').textContent = `Total: ${total} SAR`;
     }
 
+    // === ORDER NUMBER SYSTEM ===
+    function getOrderNumber() {
+      const today = new Date().toLocaleDateString();
+      const storedDate = localStorage.getItem("orderDate");
+      let orderNum = localStorage.getItem("orderNum");
+
+      if (storedDate !== today) {
+        orderNum = 1;
+        localStorage.setItem("orderDate", today);
+      } else {
+        orderNum = orderNum ? parseInt(orderNum) : 1;
+      }
+
+      localStorage.setItem("orderNum", orderNum);
+      return orderNum;
+    }
+
+    function increaseOrderNumber() {
+      let current = parseInt(localStorage.getItem("orderNum")) || 1;
+      current++;
+      localStorage.setItem("orderNum", current);
+    }
+
     function sendWhatsAppOrder() {
       let total = 0;
-      let orderText = "🧾 *Cove ORDER DETAILS:*\n";
+      let orderNum = getOrderNumber();
+      let orderText = `🧾 *COVE ORDER #${orderNum}:*\n`;
 
       document.querySelectorAll('.menu-item').forEach(item => {
         const qty = parseInt(item.querySelector('.qty').textContent) || 0;
@@ -254,6 +278,8 @@
       const encodedMessage = encodeURIComponent(orderText);
       const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
       window.open(whatsappURL, '_blank');
+
+      increaseOrderNumber(); // increase after sending
     }
   </script>
 
